@@ -1,0 +1,191 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<AssemblyName>BigWalk.AIO</AssemblyName>
+		<RootNamespace>BigWalk.AIO</RootNamespace>
+		<OutputType>Library</OutputType>
+		<PlatformTarget>x64</PlatformTarget>
+		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>disable</Nullable>
+		<DefineConstants>IL2CPP</DefineConstants>
+
+		<OutputPath Condition="'$(OutputPath)' == ''">bin\$(Configuration)\</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>embedded</DebugType>
+		<Optimize>true</Optimize>
+
+		<!-- Optional Game directory resolution (configured for Big Walk) -->
+		<GameRoot Condition="'$(GameRoot)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Big Walk</GameRoot>
+		<BepInExRoot Condition="'$(BepInExRoot)' == '' and Exists('$(GameRoot)\BepInEx')">$(GameRoot)\BepInEx</BepInExRoot>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- BepInEx 6 & IL2CPP Interop Core -->
+		<Reference Include="BepInEx.Core">
+			<HintPath Condition="Exists('$(BepInExRoot)\core\BepInEx.Core.dll')">$(BepInExRoot)\core\BepInEx.Core.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\core\BepInEx.Core.dll')">libs\BepInEx.Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="BepInEx.Unity.IL2CPP">
+			<HintPath Condition="Exists('$(BepInExRoot)\core\BepInEx.Unity.IL2CPP.dll')">$(BepInExRoot)\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\core\BepInEx.Unity.IL2CPP.dll')">libs\BepInEx.Unity.IL2CPP.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="BepInEx.Unity.Common">
+			<HintPath Condition="Exists('$(BepInExRoot)\core\BepInEx.Unity.Common.dll')">$(BepInExRoot)\core\BepInEx.Unity.Common.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\core\BepInEx.Unity.Common.dll')">libs\BepInEx.Unity.Common.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2CppInterop.Runtime">
+			<HintPath Condition="Exists('$(BepInExRoot)\core\Il2CppInterop.Runtime.dll')">$(BepInExRoot)\core\Il2CppInterop.Runtime.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\core\Il2CppInterop.Runtime.dll')">libs\Il2CppInterop.Runtime.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2CppInterop.Common">
+			<HintPath Condition="Exists('$(BepInExRoot)\core\Il2CppInterop.Common.dll')">$(BepInExRoot)\core\Il2CppInterop.Common.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\core\Il2CppInterop.Common.dll')">libs\Il2CppInterop.Common.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Il2Cppmscorlib.dll')">$(BepInExRoot)\interop\Il2Cppmscorlib.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Il2Cppmscorlib.dll')">libs\Il2Cppmscorlib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2CppSystem.Core">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Il2CppSystem.Core.dll')">$(BepInExRoot)\interop\Il2CppSystem.Core.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Il2CppSystem.Core.dll')">libs\Il2CppSystem.Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+
+		<!-- Dear ImGui Presentation Foundation -->
+		<Reference Include="DearImGuiInjectionPlus">
+			<HintPath Condition="Exists('$(BepInExRoot)\plugins\DearImGuiInjectionPlus\DearImGuiInjectionPlus.dll')">$(BepInExRoot)\plugins\DearImGuiInjectionPlus\DearImGuiInjectionPlus.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\plugins\DearImGuiInjectionPlus\DearImGuiInjectionPlus.dll')">libs\DearImGuiInjectionPlus.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="ImGui.NET">
+			<HintPath Condition="Exists('$(BepInExRoot)\plugins\DearImGuiInjectionPlus\ImGui.NET.dll')">$(BepInExRoot)\plugins\DearImGuiInjectionPlus\ImGui.NET.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\plugins\DearImGuiInjectionPlus\ImGui.NET.dll')">libs\ImGui.NET.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+
+		<!-- Game & Interop Assemblies -->
+		<Reference Include="Assembly-CSharp">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Assembly-CSharp.dll')">$(BepInExRoot)\interop\Assembly-CSharp.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Assembly-CSharp.dll')">libs\Assembly-CSharp.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Shipmates.Scripts">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Shipmates.Scripts.dll')">$(BepInExRoot)\interop\Shipmates.Scripts.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Shipmates.Scripts.dll')">libs\Shipmates.Scripts.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Shipmates.Scripts.Steam">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Shipmates.Scripts.Steam.dll')">$(BepInExRoot)\interop\Shipmates.Scripts.Steam.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Shipmates.Scripts.Steam.dll')">libs\Shipmates.Scripts.Steam.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Shipmate.Utilities">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Shipmate.Utilities.dll')">$(BepInExRoot)\interop\Shipmate.Utilities.dll</HintPath>
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Shipmates.Utilities.dll')">$(BepInExRoot)\interop\Shipmates.Utilities.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Shipmate.Utilities.dll') and !Exists('$(BepInExRoot)\interop\Shipmates.Utilities.dll')">libs\Shipmate.Utilities.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Mirror">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Mirror.dll')">$(BepInExRoot)\interop\Mirror.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Mirror.dll')">libs\Mirror.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Mirror.Authenticators">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Mirror.Authenticators.dll')">$(BepInExRoot)\interop\Mirror.Authenticators.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Mirror.Authenticators.dll')">libs\Mirror.Authenticators.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Mirror.Components">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Mirror.Components.dll')">$(BepInExRoot)\interop\Mirror.Components.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Mirror.Components.dll')">libs\Mirror.Components.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Animancer">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Animancer.dll')">$(BepInExRoot)\interop\Animancer.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Animancer.dll')">libs\Animancer.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="WaveHarmonic.Crest">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\WaveHarmonic.Crest.dll')">$(BepInExRoot)\interop\WaveHarmonic.Crest.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\WaveHarmonic.Crest.dll')">libs\WaveHarmonic.Crest.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+
+		<!-- Unity Engine Modules -->
+		<Reference Include="UnityEngine">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.dll')">$(BepInExRoot)\interop\UnityEngine.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.dll')">libs\UnityEngine.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.CoreModule.dll')">$(BepInExRoot)\interop\UnityEngine.CoreModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.CoreModule.dll')">libs\UnityEngine.CoreModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.PhysicsModule.dll')">$(BepInExRoot)\interop\UnityEngine.PhysicsModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.PhysicsModule.dll')">libs\UnityEngine.PhysicsModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.InputLegacyModule.dll')">$(BepInExRoot)\interop\UnityEngine.InputLegacyModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.InputLegacyModule.dll')">libs\UnityEngine.InputLegacyModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.InputModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.InputModule.dll')">$(BepInExRoot)\interop\UnityEngine.InputModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.InputModule.dll')">libs\UnityEngine.InputModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.IMGUIModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.IMGUIModule.dll')">$(BepInExRoot)\interop\UnityEngine.IMGUIModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.IMGUIModule.dll')">libs\UnityEngine.IMGUIModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.UI.dll')">$(BepInExRoot)\interop\UnityEngine.UI.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.UI.dll')">libs\UnityEngine.UI.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.UIModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.UIModule.dll')">$(BepInExRoot)\interop\UnityEngine.UIModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.UIModule.dll')">libs\UnityEngine.UIModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AssetBundleModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.AssetBundleModule.dll')">$(BepInExRoot)\interop\UnityEngine.AssetBundleModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.AssetBundleModule.dll')">libs\UnityEngine.AssetBundleModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.AudioModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.AudioModule.dll')">$(BepInExRoot)\interop\UnityEngine.AudioModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.AudioModule.dll')">libs\UnityEngine.AudioModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.TextRenderingModule">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\UnityEngine.TextRenderingModule.dll')">$(BepInExRoot)\interop\UnityEngine.TextRenderingModule.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\UnityEngine.TextRenderingModule.dll')">libs\UnityEngine.TextRenderingModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+
+	<!-- Optional automatic deployment to local game installation -->
+	<Target Name="DeployToGame" AfterTargets="Build" Condition="Exists('$(GameRoot)\BepInEx\plugins')">
+		<ItemGroup>
+			<PluginOutputFiles Include="$(TargetDir)$(TargetName).dll;$(TargetDir)$(TargetName).pdb" />
+		</ItemGroup>
+		<MakeDir Directories="$(GameRoot)\BepInEx\plugins\Big-Walk-AIO\" />
+		<Copy SourceFiles="@(PluginOutputFiles)" DestinationFolder="$(GameRoot)\BepInEx\plugins\Big-Walk-AIO\" SkipUnchangedFiles="true" />
+		<Message Importance="high" Text="Successfully deployed $(TargetName) to $(GameRoot)\BepInEx\plugins\Big-Walk-AIO\" />
+	</Target>
+
+</Project>

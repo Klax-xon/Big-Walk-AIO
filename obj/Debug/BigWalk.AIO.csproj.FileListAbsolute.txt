@@ -1,0 +1,10 @@
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\BigWalk.AIO.csproj.AssemblyReference.cache
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\BigWalk.AIO.GeneratedMSBuildEditorConfig.editorconfig
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\BigWalk.AIO.AssemblyInfoInputs.cache
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\BigWalk.AIO.AssemblyInfo.cs
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\BigWalk.AIO.csproj.CoreCompileInputs.cache
+D:\BepInEx stuff\big walk\Big-Walk-AIO\bin\Debug\BigWalk.AIO.deps.json
+D:\BepInEx stuff\big walk\Big-Walk-AIO\bin\Debug\BigWalk.AIO.dll
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\BigWalk.AIO.dll
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\refint\BigWalk.AIO.dll
+D:\BepInEx stuff\big walk\Big-Walk-AIO\obj\Debug\ref\BigWalk.AIO.dll
