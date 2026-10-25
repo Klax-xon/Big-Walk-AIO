@@ -98,7 +98,10 @@ public class TelemetryTab : IAioTab
         else
             DrawBadge("FALL DAZE", "NORMAL", BadgeBgInactive, BadgeTextInactive);
 
+        ImGui.Spacing();
+        ImGui.TextUnformatted("Visual & Flight:");
         ImGui.SameLine();
+
         if (snapshot.FullbrightActive)
             DrawBadge("FULLBRIGHT", "ACTIVE", BadgeBgOnline, BadgeTextOnline);
         else
@@ -140,7 +143,7 @@ public class TelemetryTab : IAioTab
                 33.3f, // 0 to ~30 FPS line
                 new Vector2(-1, 65));
 
-            ImGui.TextDisabled("Sparkline Range: 0.0 ms to 33.3 ms (60 FPS ~ 16.6 ms, 30 FPS ~ 33.3 ms)");
+            ImGui.TextWrapped("Sparkline Range: 0.0 ms to 33.3 ms (60 FPS ~ 16.6 ms, 30 FPS ~ 33.3 ms)");
         }
     }
 

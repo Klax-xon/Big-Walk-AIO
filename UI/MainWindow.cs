@@ -22,6 +22,8 @@ public class MainWindow : IImGuiWindow
     public string Id => "bigwalk_aio_main_window";
     public string Title => "Big Walk - All-In-One QA Harness";
 
+    private bool _isOpen;
+
     /// <summary>
     /// Synchronized directly with the framework's cursor visibility and input capture state.
     /// When open, cursor is visible and input is intercepted.
@@ -29,8 +31,19 @@ public class MainWindow : IImGuiWindow
     /// </summary>
     public bool IsOpen
     {
-        get => global::DearImGuiInjectionPlus.DearImGuiInjectionPlus.IsCursorVisible;
-        set => global::DearImGuiInjectionPlus.DearImGuiInjectionPlus.SetCursorVisibility(value);
+        get => _isOpen;
+        set
+        {
+            if (_isOpen != value)
+            {
+                _isOpen = value;
+                if (!value)
+                {
+                    BigWalkAIOPlugin.PendingClearImGuiFocus = true;
+                }
+                BigWalkAIOPlugin.SyncCursorState();
+            }
+        }
     }
 
     private readonly StructSnapshotPipeline<GameTelemetrySnapshot> _pipeline;
@@ -77,8 +90,8 @@ public class MainWindow : IImGuiWindow
         if (!IsOpen)
             return;
 
-        // Check toggle hotkey while window has ImGui input focus
-        if (CheckToggleHotkeyPressed())
+        // Allow Insert or Escape key to close the main window when ImGui has focus
+        if (ImGui.IsKeyPressed(ImGuiKey.Insert, false) || ImGui.IsKeyPressed(ImGuiKey.Escape, false))
         {
             IsOpen = false;
             return;
@@ -197,11 +210,5 @@ public class MainWindow : IImGuiWindow
         }
 
         ImGui.EndChild();
-    }
-
-    private static bool CheckToggleHotkeyPressed()
-    {
-        // Standardized strictly on Insert key for unified toggle behavior
-        return ImGui.IsKeyPressed(ImGuiKey.Insert, false);
     }
 }

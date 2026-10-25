@@ -39,7 +39,8 @@ public class VisionTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Local Fullbright & Fog Neutralizer (Feature 2)", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Overrides ambient illumination and volumetric fog for underground/night exploration:");
+            ImGui.TextWrapped("Overrides ambient illumination and volumetric fog for underground/night exploration:");
+            ImGui.Spacing();
 
             bool fullbright = _state.FullbrightActive;
             if (ImGui.Checkbox("Enable Ambient Fullbright", ref fullbright))
@@ -57,17 +58,23 @@ public class VisionTab : IAioTab
                 _console.LogInfo($"Fog neutralization toggled: {(noFog ? "ENABLED" : "DISABLED")}");
             }
 
-            // Fullbright Intensity Slider
-            ImGui.SetNextItemWidth(-140f);
+            // Fullbright Intensity Slider (Calibrated 0.0x - 2.0x, Default 1.0x)
+            float avail = ImGui.GetContentRegionAvail().X;
+            ImGui.SetNextItemWidth(MathF.Max(avail * 0.48f, 130f));
             float intensity = _state.FullbrightIntensity;
-            if (ImGui.SliderFloat("Light Intensity", ref intensity, 1.0f, 5.0f, "%.1fx"))
+            if (ImGui.SliderFloat("Light Intensity", ref intensity, 0.0f, 2.0f, "%.2fx"))
             {
                 _state.FullbrightIntensity = intensity;
             }
+            ImGui.SameLine();
+            if (ImGui.SmallButton("Reset Default (1.0x)"))
+            {
+                _state.FullbrightIntensity = 1.0f;
+            }
 
             ImGui.Spacing();
-            ImGui.BulletText("Forces RenderSettings.ambientMode to Flat and ambientLight to Pure White");
-            ImGui.BulletText("Asserted continuously in LateUpdate to override Enviro 3 dynamic time cycles");
+            ImGui.BulletText("Forces RenderSettings.ambientMode to Flat with scalable illumination");
+            ImGui.BulletText("Suppresses Enviro 3 dynamic lighting cycles to prevent ~3s black flicker");
             ImGui.BulletText("Automatically restores original lighting & fog parameters upon deactivation");
         }
     }
@@ -76,7 +83,8 @@ public class VisionTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Cinematic Free-Camera Fixture (Feature 6)", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Hooks the game's internal CameraCheatMover for unconstrained 6DoF observation:");
+            ImGui.TextWrapped("Hooks the game's internal CameraCheatMover for unconstrained 6DoF observation:");
+            ImGui.Spacing();
 
             // Status Badge
             ImGui.TextUnformatted("Camera Status:");
@@ -106,14 +114,17 @@ public class VisionTab : IAioTab
             ImGui.Spacing();
 
             // Sliders for Free-Cam Moving Speed & Sensitivity
-            ImGui.SetNextItemWidth(-140f);
+            float avail = ImGui.GetContentRegionAvail().X;
+            float sliderW = MathF.Max(avail * 0.52f, 140f);
+
+            ImGui.SetNextItemWidth(sliderW);
             float speed = _state.FreeCamSpeed;
             if (ImGui.SliderFloat("Flight Movement Speed", ref speed, 2.0f, 60.0f, "%.1f m/s"))
             {
                 _state.FreeCamSpeed = speed;
             }
 
-            ImGui.SetNextItemWidth(-140f);
+            ImGui.SetNextItemWidth(sliderW);
             float sens = _state.FreeCamSensitivity;
             if (ImGui.SliderFloat("Mouse Sensitivity", ref sens, 0.5f, 10.0f, "%.1fx"))
             {
@@ -149,7 +160,9 @@ public class VisionTab : IAioTab
             }
 
             ImGui.Spacing();
-            ImGui.BulletText("Controls during free-cam: Standard WASD keys + Mouse look");
+            ImGui.BulletText("Flight controls: Arrow Keys (Forward/Back/Strafe) + PgUp/PgDn (or R/F) for Elevation");
+            ImGui.BulletText("Hold [LeftShift] for 2.5x flight speed boost; Mouse look aims the camera");
+            ImGui.BulletText("Decoupled from WASD to prevent simultaneous character walking in the background");
             ImGui.BulletText("Press [F2] anytime in-game to toggle free camera instantaneously");
         }
     }

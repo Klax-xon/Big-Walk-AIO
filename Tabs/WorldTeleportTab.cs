@@ -67,10 +67,12 @@ public class WorldTeleportTab : IAioTab
     {
         if (ImGui.CollapsingHeader("World Gourd & Landmark Teleporter (Feature 8)", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Select any registered quest gourd or puzzle landmark to warp directly to its world location:");
+            ImGui.TextWrapped("Select any registered quest gourd or puzzle landmark to warp directly to its world location:");
+            ImGui.Spacing();
 
             // Search filter
-            ImGui.SetNextItemWidth(-120f);
+            float avail = ImGui.GetContentRegionAvail().X;
+            ImGui.SetNextItemWidth(MathF.Max(avail - 65f, 120f));
             ImGui.InputTextWithHint("##GourdSearch", "Filter gourds...", ref _searchFilter, 64);
 
             ImGui.SameLine();
@@ -136,17 +138,11 @@ public class WorldTeleportTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Manual Coordinate Translocation", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Precision coordinate warping across world coordinates:");
-
-            float x = _manualCoords.X;
-            float y = _manualCoords.Y;
-            float z = _manualCoords.Z;
+            ImGui.TextWrapped("Precision coordinate warping across world coordinates:");
+            ImGui.Spacing();
 
             ImGui.SetNextItemWidth(-1f);
-            if (ImGui.InputFloat3("World Coords (X, Y, Z)", ref _manualCoords))
-            {
-                // Updated
-            }
+            ImGui.InputFloat3("World Coords (X, Y, Z)", ref _manualCoords);
 
             ImGui.Spacing();
 

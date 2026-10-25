@@ -119,6 +119,21 @@
 			<HintPath Condition="!Exists('$(BepInExRoot)\interop\WaveHarmonic.Crest.dll')">libs\WaveHarmonic.Crest.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="Enviro3.Runtime">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Enviro3.Runtime.dll')">$(BepInExRoot)\interop\Enviro3.Runtime.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Enviro3.Runtime.dll')">libs\Enviro3.Runtime.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Rewired_Core">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Rewired_Core.dll')">$(BepInExRoot)\interop\Rewired_Core.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Rewired_Core.dll')">libs\Rewired_Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Rewired_Windows">
+			<HintPath Condition="Exists('$(BepInExRoot)\interop\Rewired_Windows.dll')">$(BepInExRoot)\interop\Rewired_Windows.dll</HintPath>
+			<HintPath Condition="!Exists('$(BepInExRoot)\interop\Rewired_Windows.dll')">libs\Rewired_Windows.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 
 		<!-- Unity Engine Modules -->
 		<Reference Include="UnityEngine">

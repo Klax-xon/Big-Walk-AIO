@@ -45,10 +45,14 @@ public class LocomotionTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Kinematic Locomotion Tuning (Speed & Jump)", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Dynamically scale local player kinematic velocities via continuous engine assertion:");
+            ImGui.TextWrapped("Dynamically scale local player kinematic velocities via continuous engine assertion:");
+            ImGui.Spacing();
+
+            float avail = ImGui.GetContentRegionAvail().X;
+            float sliderWidth = MathF.Max(avail * 0.52f, 140f);
 
             // Speed Multiplier
-            ImGui.SetNextItemWidth(-140f);
+            ImGui.SetNextItemWidth(sliderWidth);
             float speed = _state.SpeedMultiplier;
             if (ImGui.SliderFloat("Speed Multiplier", ref speed, 1.0f, 5.0f, "%.2fx"))
             {
@@ -63,7 +67,7 @@ public class LocomotionTab : IAioTab
             }
 
             // Jump Force Multiplier
-            ImGui.SetNextItemWidth(-140f);
+            ImGui.SetNextItemWidth(sliderWidth);
             float jump = _state.JumpMultiplier;
             if (ImGui.SliderFloat("Jump Multiplier", ref jump, 1.0f, 5.0f, "%.2fx"))
             {
@@ -76,6 +80,8 @@ public class LocomotionTab : IAioTab
                 _state.JumpMultiplier = 1.0f;
                 _console.LogInfo("Jump multiplier reset to 1.0x.");
             }
+
+            ImGui.Spacing();
 
             // Quick Preset Buttons
             ImGui.TextUnformatted("Speed Presets:");
@@ -94,7 +100,8 @@ public class LocomotionTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Slope & Climb Traversability Bypass (Feature 3)", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Overrides surface slope angles and sliding resistance in PlayerGround:");
+            ImGui.TextWrapped("Overrides surface slope angles and sliding resistance in PlayerGround:");
+            ImGui.Spacing();
 
             bool climb = _state.InfiniteClimbActive;
             if (ImGui.Checkbox("Infinite Climb & Traversability Bypass", ref climb))
@@ -103,8 +110,8 @@ public class LocomotionTab : IAioTab
                 _console.LogInfo($"Infinite Climb toggled: {(climb ? "ENABLED" : "DISABLED")}");
             }
 
-            ImGui.BulletText("Forces slope limits to 90.0° angles (enables scaling sheer vertical cliffs)");
-            ImGui.BulletText("Neutralizes water movement drag and steep surface grip penalties");
+            ImGui.BulletText("Forces slope limits to 89.0° angles (scales steep cliffs without clipping)");
+            ImGui.BulletText("Preserves ground snapping and friction calculation (prevents catching or getting stuck)");
             ImGui.BulletText("Restores native engine physics angles seamlessly when toggled off");
         }
     }
@@ -113,7 +120,8 @@ public class LocomotionTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Fall Hazard & Daze Suppression (Feature 4)", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Prevents incapacitated knockdown states and fall penalties in PlayerFaller:");
+            ImGui.TextWrapped("Prevents incapacitated knockdown states and fall penalties in PlayerFaller:");
+            ImGui.Spacing();
 
             bool noFall = _state.NoFallDazeActive;
             if (ImGui.Checkbox("Suppress Fall Hazard & Incapacitation Daze", ref noFall))
@@ -130,27 +138,10 @@ public class LocomotionTab : IAioTab
 
     private void DrawGeneralTogglesSection()
     {
-        if (ImGui.CollapsingHeader("Vitality & General Sandbox Overrides", ImGuiTreeNodeFlags.DefaultOpen))
+        if (ImGui.CollapsingHeader("Time & Camera Sandbox Overrides", ImGuiTreeNodeFlags.DefaultOpen))
         {
             if (ImGui.BeginTable("##LocoGeneralGrid", 2, ImGuiTableFlags.None))
             {
-                ImGui.TableNextRow();
-                ImGui.TableNextColumn();
-                bool god = _state.GodMode;
-                if (ImGui.Checkbox("God Mode (Invulnerability)", ref god))
-                {
-                    _state.GodMode = god;
-                    _console.LogInfo($"God Mode: {(god ? "ENABLED" : "DISABLED")}");
-                }
-
-                ImGui.TableNextColumn();
-                bool stamina = _state.InfiniteStamina;
-                if (ImGui.Checkbox("Infinite Stamina", ref stamina))
-                {
-                    _state.InfiniteStamina = stamina;
-                    _console.LogInfo($"Infinite Stamina: {(stamina ? "ENABLED" : "DISABLED")}");
-                }
-
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 bool freeze = _state.FreezeTime;
@@ -160,7 +151,8 @@ public class LocomotionTab : IAioTab
                 }
 
                 ImGui.TableNextColumn();
-                ImGui.SetNextItemWidth(-80f);
+                float colAvail = ImGui.GetContentRegionAvail().X;
+                ImGui.SetNextItemWidth(MathF.Max(colAvail * 0.50f, 100f));
                 float fov = _state.FieldOfView;
                 if (ImGui.SliderFloat("Camera FOV", ref fov, 60.0f, 130.0f, "%.0f°"))
                 {

@@ -59,14 +59,18 @@ public class SettingsTab : IAioTab
             var io = ImGui.GetIO();
             float currentScale = io.FontGlobalScale;
 
-            ImGui.TextDisabled("Adjust the global font and interface scale dynamically for 1080p, 1440p, or 4K displays:");
+            ImGui.TextWrapped("Adjust the global font and interface scale dynamically for 1080p, 1440p, or 4K displays:");
+            ImGui.Spacing();
 
+            float avail = ImGui.GetContentRegionAvail().X;
+            ImGui.SetNextItemWidth(MathF.Max(avail * 0.52f, 150f));
             if (ImGui.SliderFloat("UI / Font Scale", ref currentScale, 0.75f, 2.50f, "%.2fx"))
             {
                 io.FontGlobalScale = currentScale;
                 _onScaleChanged?.Invoke(currentScale);
             }
 
+            ImGui.Spacing();
             ImGui.TextUnformatted("Quick Resolution Presets:");
             ImGui.SameLine();
 
@@ -99,8 +103,11 @@ public class SettingsTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Dynamic Visual Theme", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Select between 2 fully custom designed themes and pure vanilla Dear ImGui classic:");
+            ImGui.TextWrapped("Select between 2 fully custom designed themes and pure vanilla Dear ImGui classic:");
+            ImGui.Spacing();
 
+            float avail = ImGui.GetContentRegionAvail().X;
+            ImGui.SetNextItemWidth(MathF.Max(avail * 0.52f, 150f));
             int current = (int)ThemeManager.CurrentTheme;
             if (ImGui.Combo("Active Theme", ref current, ThemeManager.ThemeNames, ThemeManager.ThemeNames.Length))
             {
@@ -137,30 +144,40 @@ public class SettingsTab : IAioTab
 
     private void DrawMinimapPreferencesSection()
     {
-        if (ImGui.CollapsingHeader("World Radar & Minimap Preferences", ImGuiTreeNodeFlags.DefaultOpen))
+        if (ImGui.CollapsingHeader("World Radar & Map Preferences", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Configure real-time 2D radar overlay projection parameters:");
+            ImGui.TextWrapped("Configure real-time 2D radar overlay and full world map projection parameters:");
+            ImGui.Spacing();
 
-            bool visible = _state.MinimapVisible;
-            if (ImGui.Checkbox("Radar Overlay Visible (Hotkey: M)", ref visible))
+            bool hudVisible = _state.HudMinimapVisible;
+            if (ImGui.Checkbox("Show Corner HUD Minimap", ref hudVisible))
             {
-                _state.MinimapVisible = visible;
+                _state.HudMinimapVisible = hudVisible;
             }
 
-            ImGui.SameLine();
+            bool fullMap = _state.FullMapOpen;
+            if (ImGui.Checkbox("Open Full World Map (Hotkey: M)", ref fullMap))
+            {
+                _state.FullMapOpen = fullMap;
+            }
 
             bool headingUp = _state.MinimapHeadingUp;
-            if (ImGui.Checkbox("Heading-Up Rotation Mode", ref headingUp))
+            if (ImGui.Checkbox("HUD Heading-Up Rotation", ref headingUp))
             {
                 _state.MinimapHeadingUp = headingUp;
             }
 
+            ImGui.Spacing();
+
+            float avail = ImGui.GetContentRegionAvail().X;
+            ImGui.SetNextItemWidth(MathF.Max(avail * 0.52f, 150f));
             float zoom = _state.MinimapZoom;
-            ImGui.SetNextItemWidth(-140f);
             if (ImGui.SliderFloat("Radar Canvas Zoom", ref zoom, 0.1f, 2.0f, "%.2fx"))
             {
                 _state.MinimapZoom = zoom;
             }
+
+            ImGui.Spacing();
 
             bool showGourds = _state.MinimapShowLandmarks;
             if (ImGui.Checkbox("Render Gourd & Quest Landmarks", ref showGourds))
@@ -189,7 +206,7 @@ public class SettingsTab : IAioTab
         if (ImGui.CollapsingHeader("Input Confinement & Hotkey Preferences", ImGuiTreeNodeFlags.DefaultOpen))
         {
             ImGui.LabelText("Main Menu Toggle Hotkey", "Insert");
-            ImGui.LabelText("Radar Minimap Toggle Hotkey", "M");
+            ImGui.LabelText("Island World Map Hotkey", "M");
             ImGui.LabelText("Cinematic Free-Cam Toggle Hotkey", "F2");
 
             ImGui.Spacing();
@@ -204,7 +221,9 @@ public class SettingsTab : IAioTab
                 }
                 _console.LogInfo($"Auto-manage cursor set to: {autoManage}");
             }
-            ImGui.TextDisabled("When enabled, closing the window releases the cursor and seamlessly unblocks game input.");
+            ImGui.TextWrapped("When enabled, closing the window releases the cursor and seamlessly unblocks game input.");
+
+            ImGui.Spacing();
 
             // Block All Inputs Toggle
             bool blockAll = DearImGuiInjectionPlus.DearImGuiInjectionPlus.BlockAllInputsWhenOpen;
@@ -213,7 +232,7 @@ public class SettingsTab : IAioTab
                 DearImGuiInjectionPlus.DearImGuiInjectionPlus.BlockAllInputsWhenOpen = blockAll;
                 _console.LogInfo($"BlockAllInputsWhenOpen set to: {blockAll}");
             }
-            ImGui.TextDisabled("When enabled, all mouse clicks, movements, and keystrokes are swallowed while the UI is open.");
+            ImGui.TextWrapped("When enabled, all mouse clicks, movements, and keystrokes are swallowed while the UI is open.");
         }
     }
 

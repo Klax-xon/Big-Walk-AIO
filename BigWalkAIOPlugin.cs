@@ -47,10 +47,17 @@ public class BigWalkAIOPlugin : BasePlugin
     public GuiConsole Console { get; private set; }
     public MainWindow Window { get; private set; }
     public MinimapWindow MinimapWindow { get; private set; }
+    public FullMapWindow FullMapWindow { get; private set; }
 
     private GameObject _runnerGo;
     private bool _isTornDown;
     private bool _initialStyleApplied;
+
+    /// <summary>
+    /// Flag checked on the DirectX Present hook thread (inside DII.Render) to unconditionally
+    /// clear ImGui focus when menu overlays close.
+    /// </summary>
+    public static bool PendingClearImGuiFocus;
 
     public override void Load()
     {
@@ -75,7 +82,7 @@ public class BigWalkAIOPlugin : BasePlugin
             "Keybinds",
             "MinimapKey",
             KeyCode.M,
-            "Keyboard key used to toggle the World Radar Minimap overlay (defaults to M).");
+            "Keyboard key used to toggle the expanded Island World Map overlay (defaults to M).");
 
         AutoManageCursorConfig = Config.Bind(
             "Input",
@@ -110,13 +117,15 @@ public class BigWalkAIOPlugin : BasePlugin
             onScaleChanged: SaveScalePreference);
 
         MinimapWindow = new MinimapWindow(MinimapPipeline, ControlState);
+        FullMapWindow = new FullMapWindow(MinimapPipeline, ControlState);
 
         // 4. Register windows (Standalone overlay - no persistent top menu bar)
         DII.RegisterWindow(Window);
         DII.RegisterWindow(MinimapWindow);
+        DII.RegisterWindow(FullMapWindow);
 
-        // 5. Apply theme on first ImGui render
-        DII.Render += ApplyInitialStyle;
+        // 5. Hook ImGui render loop for theme initialization and focus clearing
+        DII.Render += OnImGuiRenderFrame;
 
         // 6. Register and spawn IL2CPP MonoBehaviour Runner
         if (!ClassInjector.IsTypeRegisteredInIl2Cpp<BigWalkAIORunner>())
@@ -129,25 +138,32 @@ public class BigWalkAIOPlugin : BasePlugin
         PluginLog.Info($"[{PluginInfo.Name}] Loaded successfully. Press [Insert] to open UI.");
     }
 
-    private void ApplyInitialStyle()
+    private void OnImGuiRenderFrame()
     {
-        if (_initialStyleApplied)
-            return;
+        if (!_initialStyleApplied)
+        {
+            try
+            {
+                ThemeManager.ApplyTheme(SelectedThemeConfig.Value);
+                ImGui.GetIO().FontGlobalScale = UiScaleConfig.Value;
+                _initialStyleApplied = true;
+                PluginLog.Info($"[{PluginInfo.Name}] Applied theme '{SelectedThemeConfig.Value}' and scale '{UiScaleConfig.Value:F2}x'.");
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Warning($"[{PluginInfo.Name}] Error applying initial style: {ex.Message}");
+            }
+        }
 
-        try
+        // Unconditionally clear ImGui active and hovered window focus when menu transitions to closed
+        if (PendingClearImGuiFocus)
         {
-            ThemeManager.ApplyTheme(SelectedThemeConfig.Value);
-            ImGui.GetIO().FontGlobalScale = UiScaleConfig.Value;
-            _initialStyleApplied = true;
-            PluginLog.Info($"[{PluginInfo.Name}] Applied theme '{SelectedThemeConfig.Value}' and scale '{UiScaleConfig.Value:F2}x'.");
-        }
-        catch (Exception ex)
-        {
-            PluginLog.Warning($"[{PluginInfo.Name}] Error applying initial style: {ex.Message}");
-        }
-        finally
-        {
-            DII.Render -= ApplyInitialStyle;
+            try
+            {
+                ImGui.SetWindowFocus(null);
+            }
+            catch { }
+            PendingClearImGuiFocus = false;
         }
     }
 
@@ -164,6 +180,31 @@ public class BigWalkAIOPlugin : BasePlugin
         if (UiScaleConfig != null)
         {
             UiScaleConfig.Value = scale;
+        }
+    }
+
+    /// <summary>
+    /// Synchronizes Dear ImGui cursor visibility with open interactive overlay windows (MainWindow / FullMapWindow).
+    /// Bypasses PlayerHead look spin during open UI, and lets DearImGuiInjectionPlus handle all cursor detours/restoration.
+    /// </summary>
+    public static void SyncCursorState()
+    {
+        var plugin = Instance;
+        if (plugin == null || plugin._isTornDown) return;
+
+        bool mainOpen = plugin.Window?.IsOpen ?? false;
+        bool mapOpen = plugin.FullMapWindow?.IsOpen ?? false;
+        bool shouldBeVisible = mainOpen || mapOpen;
+
+        if (DII.IsCursorVisible != shouldBeVisible)
+        {
+            DII.SetCursorVisibility(shouldBeVisible);
+        }
+
+        var player = WorldManager.localPlayerCharacter;
+        if (player != null && player.head != null)
+        {
+            player.head.bypassUpdate = shouldBeVisible;
         }
     }
 
@@ -215,7 +256,7 @@ public class BigWalkAIOPlugin : BasePlugin
         _isTornDown = true;
         PluginLog.Info($"[{PluginInfo.Name}] Performing clean teardown...");
 
-        DII.Render -= ApplyInitialStyle;
+        DII.Render -= OnImGuiRenderFrame;
 
         if (Window != null)
         {
@@ -228,6 +269,14 @@ public class BigWalkAIOPlugin : BasePlugin
             DII.UnregisterWindow(MinimapWindow);
             MinimapWindow.IsOpen = false;
         }
+
+        if (FullMapWindow != null)
+        {
+            DII.UnregisterWindow(FullMapWindow);
+            FullMapWindow.IsOpen = false;
+        }
+
+        MapTextureManager.Teardown();
 
         if (_runnerGo != null)
         {

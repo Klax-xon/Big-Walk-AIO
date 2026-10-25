@@ -12,8 +12,8 @@ namespace BigWalk.AIO.State;
 /// </summary>
 public class PlayerControlState
 {
-    // --- Feature 1: Minimap & Radar Settings ---
-    public bool MinimapVisible { get; set; } = true;
+    // --- Feature 1: Lightweight HUD Minimap Settings ---
+    public bool HudMinimapVisible { get; set; } = true;
     public float MinimapZoom { get; set; } = 0.50f;
     public float MinimapRadius { get; set; } = 130f;
     public bool MinimapHeadingUp { get; set; } = false;
@@ -21,9 +21,35 @@ public class PlayerControlState
     public bool MinimapShowPeers { get; set; } = true;
     public bool MinimapShowCoordinates { get; set; } = true;
 
+    // --- Feature 1b: Expanded Fullscreen Map ('M' Hotkey) Settings & Filters ---
+    private bool _fullMapOpen = false;
+    public bool FullMapOpen
+    {
+        get => _fullMapOpen;
+        set
+        {
+            if (_fullMapOpen != value)
+            {
+                _fullMapOpen = value;
+                var mapWin = BigWalkAIOPlugin.Instance?.FullMapWindow;
+                if (mapWin != null && mapWin.IsOpen != value)
+                {
+                    mapWin.IsOpen = value;
+                }
+            }
+        }
+    }
+    public bool FullMapShowPlayers { get; set; } = true;
+    public bool FullMapShowLandmarks { get; set; } = true;
+    public bool FullMapShowMedals { get; set; } = true;
+    public bool FullMapShowGourds { get; set; } = true;
+    public float FullMapZoom { get; set; } = 1.0f;
+    public float FullMapPanX { get; set; } = 0.0f;
+    public float FullMapPanY { get; set; } = 0.0f;
+
     // --- Feature 2: Fullbright & Fog Neutralizer ---
     public bool FullbrightActive { get; set; } = false;
-    public float FullbrightIntensity { get; set; } = 2.0f;
+    public float FullbrightIntensity { get; set; } = 1.0f;
     public bool DisableFog { get; set; } = true;
 
     // --- Feature 3: Slope & Climb Traversability Bypass ---
@@ -41,12 +67,9 @@ public class PlayerControlState
     public float FreeCamSpeed { get; set; } = 15.0f;
     public float FreeCamSensitivity { get; set; } = 3.0f;
 
-    // --- Legacy / General Sandbox Toggles ---
-    public bool GodMode { get; set; } = false;
-    public bool InfiniteStamina { get; set; } = false;
+    // --- General Sandbox Toggles ---
     public bool FreezeTime { get; set; } = false;
     public float FieldOfView { get; set; } = 90.0f;
-    public float GravityScale { get; set; } = 1.0f;
 
     // --- Feature 8: Prop & Gourd Teleportation Dispatchers ---
     public void TeleportToCoordinates(Vector3 targetPos, Action<string> onLogged = null)
@@ -142,6 +165,7 @@ public class PlayerControlState
                     if (camMover._detached)
                     {
                         camMover.Attach();
+                        camMover.movingSpeed = 10f; // Restore default speed
                         FreeCamDetached = false;
                         onLogged?.Invoke("[FreeCam] Attached camera back to player head.");
                     }
@@ -152,11 +176,12 @@ public class PlayerControlState
                             cheater.cheatTextIsPrimed = true;
                             cheater.cheatButtonsIsPrimed = true;
                         }
-                        camMover.movingSpeed = FreeCamSpeed;
+                        // Zero out native movingSpeed so WASD does not simultaneously move the camera and character
+                        camMover.movingSpeed = 0f;
                         camMover.sensitivity = FreeCamSensitivity;
                         camMover.Detach();
                         FreeCamDetached = true;
-                        onLogged?.Invoke($"[FreeCam] Camera detached for free flight (Speed: {FreeCamSpeed:F1}, Sens: {FreeCamSensitivity:F1}).");
+                        onLogged?.Invoke($"[FreeCam] Camera detached for free flight (Speed: {FreeCamSpeed:F1}, Sens: {FreeCamSensitivity:F1}). Controls: Arrow Keys + PgUp/PgDn (or R/F).");
                     }
                 }
                 else

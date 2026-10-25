@@ -54,10 +54,12 @@ public class DebugOperationsTab : IAioTab
     {
         if (ImGui.CollapsingHeader("Native Game Operations Catalog (Feature 7)", ImGuiTreeNodeFlags.DefaultOpen))
         {
-            ImGui.TextDisabled("Directly execute Big Walk's internal Shipmates.RemotePlayerDebug command suite:");
+            ImGui.TextWrapped("Directly execute Big Walk's internal Shipmates.RemotePlayerDebug command suite:");
+            ImGui.Spacing();
 
             // Search filter bar
-            ImGui.SetNextItemWidth(-100f);
+            float avail = ImGui.GetContentRegionAvail().X;
+            ImGui.SetNextItemWidth(MathF.Max(avail - 65f, 120f));
             ImGui.InputTextWithHint("##OpSearch", "Filter operations...", ref _filterText, 64);
 
             ImGui.SameLine();
@@ -71,7 +73,7 @@ public class DebugOperationsTab : IAioTab
             // 2-Column Responsive Operations Table
             if (ImGui.BeginTable("##OperationsGrid", 2, ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.RowBg))
             {
-                ImGui.TableSetupColumn("Operation Command", ImGuiTableColumnFlags.WidthFixed, 220f);
+                ImGui.TableSetupColumn("Operation Command", ImGuiTableColumnFlags.WidthFixed, 200f);
                 ImGui.TableSetupColumn("Description", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableHeadersRow();
 
@@ -95,15 +97,15 @@ public class DebugOperationsTab : IAioTab
                     }
 
                     ImGui.TableNextColumn();
-                    ImGui.TextDisabled(desc);
+                    ImGui.TextWrapped(desc);
                 }
 
                 ImGui.EndTable();
             }
 
             ImGui.Spacing();
-            ImGui.BulletText("Dispatches RemotePlayerRequest to RemotePlayerDebugReceiver on the Unity main thread");
-            ImGui.BulletText("Non-destructive: commands toggle internal engine states and can be triggered repeatedly");
+            ImGui.BulletText("Reflects into Shipmates.RemotePlayerDebug instance on local player");
+            ImGui.BulletText("Suppresses game UI toast notifications while executing commands safely");
         }
     }
 }
